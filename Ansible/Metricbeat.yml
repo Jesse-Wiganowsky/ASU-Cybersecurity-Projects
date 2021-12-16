@@ -1,0 +1,38 @@
+---
+- name: Installing and Launch Metricbeat
+  hosts: webservers
+  become: true
+  tasks:
+    # Use copy module
+  - name: drop in metricbeat package
+    copy:
+      src: /etc/ansible/files/metricbeat-7.6.1-amd64.deb
+      dest: metricbeat-7.6.1-amd64.deb
+
+    # Use command module
+  - name: install metricbeat
+    command: dpkg -i metricbeat-7.6.1-amd64.deb
+
+    # Use copy module
+  - name: Drop in metricbeat config
+    copy:
+      src: /etc/ansible/files/metricbeat-config.yml
+      dest: /etc/metricbeat/metricbeat.yml
+
+    # Use command module
+  - name: Enable and Configure Docker Module for Metricbeat
+    command: metricbeat modules enable system
+
+    # Use command module
+  - name: Setup Metricbeat
+    command: metricbeat setup
+
+    # Use command module
+  - name: Start Metricbeat service
+    command: service metricbeat start
+
+    # Use systemd module
+  - name: Enable service Metricbeat on boot
+    systemd:
+      name: metricbeat
+      enabled: yes
